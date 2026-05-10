@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"/>
+<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()"/>
+<title>🐳 Whale Pump Scanner PRO v4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#020b14;--bg2:#071020;--bg3:#0d1b2a;
+  --green:#10b981;--yellow:#f59e0b;--red:#ef4444;
+  --blue:#3b82f6;--purple:#6366f1;--pink:#ec4899;
+  --text:#e2e8f0;--muted:#334155;--dim:#1e293b;
+  --font-mono:'Share Tech Mono',monospace;
+  --font-hud:'Orbitron',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-mono);min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;
+  background-image:linear-gradient(rgba(16,185,129,.03) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(16,185,129,.03) 1px,transparent 1px);
+  background-size:30px 30px;pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#10b98133;border-radius:2px}
+
+/* HEADER */
+#header{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid rgba(16,185,129,.15);
+  background:rgba(2,11,20,.96);backdrop-filter:blur(12px);flex-wrap:wrap;gap:8px}
+.logo-wrap{display:flex;align-items:center;gap:10}
+.logo-whale{font-size:26px;filter:drop-shadow(0 0 12px rgba(16,185,129,.7))}
+.logo-title{font-family:var(--font-hud);font-size:12px;font-weight:900;letter-spacing:3px;
+  color:var(--green);text-shadow:0 0 18px rgba(16,185,129,.5)}
+.logo-sub{font-size:8px;color:var(--yellow);letter-spacing:2px;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fg-box{border:1px solid;border-radius:8px;padding:5px 10px;text-align:center;min-width:72px;font-family:var(--font-hud)}
+.fg-label{font-size:7px;color:var(--muted);letter-spacing:2px}
+.fg-val{font-size:18px;font-weight:900}
+.fg-txt{font-size:8px}
+.ibtn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  color:var(--muted);font-size:15px;width:36px;height:36px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative}
+.ibtn.on{background:rgba(16,185,129,.1);border-color:var(--green);color:var(--green)}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;
+  background:var(--red);animation:pulse 1.5s infinite}
+
+/* SESSION BAR */
+#session-bar{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.04);
+  overflow-x:auto;flex-wrap:wrap;align-items:center;position:relative;z-index:1}
+.s-chip{display:flex;flex-direction:column;gap:1px;padding:5px 10px;border-radius:7px;
+  border:1px solid rgba(255,255,255,.05);white-space:nowrap;transition:all .3s}
+.s-chip.active{border-color:var(--yellow)}
+.s-time{font-size:8px;color:var(--muted)}
+.s-label{font-size:9px;font-weight:700;font-family:var(--font-hud)}
+.cap-bar{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap}
+.cap-item{font-size:8px;color:var(--muted);padding:3px 8px;background:rgba(245,158,11,.05);border-radius:4px;white-space:nowrap}
+
+/* SCAN ROW */
+#scan-row{display:flex;align-items:center;gap:10px;padding:12px 14px;flex-wrap:wrap;position:relative;z-index:1}
+#scan-btn{display:flex;align-items:center;gap:8px;padding:11px 22px;
+  background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:10px;
+  color:#fff;font-family:var(--font-hud);font-size:10px;font-weight:700;letter-spacing:1.5px;
+  cursor:pointer;box-shadow:0 0 22px rgba(16,185,129,.3);transition:all .2s}
+#scan-btn:disabled{background:linear-gradient(135deg,#1e293b,#0f172a);box-shadow:none;cursor:not-allowed}
+.spinner{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.2);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.last-txt{font-size:10px;color:var(--muted)}
+.auto-badge{font-size:10px;color:var(--green);background:rgba(16,185,129,.08);
+  padding:4px 10px;border-radius:6px;border:1px solid rgba(16,185,129,.2)}
+
+/* PROGRESS */
+#prog-track{height:3px;background:rgba(255,255,255,.04);margin:0 14px;border-radius:2px;overflow:hidden;display:none}
+#prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#10b981,#34d399);transition:width .2s;box-shadow:0 0 8px #10b981}
+
+/* PUMP BANNER */
+#pump-banner{display:none;margin:10px 14px 0;padding:12px 16px;
+  background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);
+  border-radius:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+  position:relative;z-index:1}
+.pb-left{display:flex;flex-direction:column;gap:4px}
+.pb-label{font-size:8px;color:var(--muted);letter-spacing:2px}
+.pb-name{font-family:var(--font-hud);font-size:14px;font-weight:900;color:var(--green)}
+.pb-right{font-family:var(--font-hud);font-size:22px;font-weight:900}
+
+/* TABS */
+#tab-bar{display:none;gap:6px;padding:12px 14px 0;overflow-x:auto;position:relative;z-index:1}
+.tab-btn{display:flex;align-items:center;gap:5px;padding:8px 14px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;
+  color:var(--muted);font-family:var(--font-hud);font-size:8px;font-weight:700;letter-spacing:1.5px;
+  cursor:pointer;white-space:nowrap;transition:all .2s}
+.tab-btn.active{background:rgba(16,185,129,.1);border-color:var(--green);color:var(--green)}
+.tab-count{background:rgba(255,255,255,.08);border-radius:10px;padding:1px 7px;font-size:8px;font-weight:900}
+.tab-btn.active .tab-count{background:var(--green);color:#000}
+
+/* SECTION */
+.section{margin:12px 10px 0;position:relative;z-index:1;display:none}
+.section.active{display:block}
+.s-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.s-hdr-icon{font-size:16px}
+.s-hdr-title{font-family:var(--font-hud);font-size:10px;font-weight:900;letter-spacing:3px;color:var(--green)}
+.s-hdr-sub{font-size:9px;color:var(--muted);margin-top:2px}
+
+/* CARD GRID */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.opp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+
+/* COIN CARD */
+.ccard{background:rgba(7,16,29,.98);border:1px solid var(--bg3);border-radius:12px;
+  padding:13px 12px 10px;position:relative;transition:border-color .3s}
+.ccard.flash{animation:flashAnim 1.2s ease}
+.rank-b{position:absolute;top:9px;left:9px;width:22px;height:22px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;
+  color:#000;font-family:var(--font-hud)}
+.al-b{position:absolute;top:9px;right:9px;background:rgba(16,185,129,.08);
+  border:1px solid rgba(16,185,129,.25);border-radius:4px;font-size:8px;font-weight:900;
+  color:var(--green);padding:2px 6px;letter-spacing:1px;font-family:var(--font-hud)}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-top:28px;margin-bottom:4px}
+.coin-name{font-family:var(--font-hud);font-size:13px;font-weight:900;color:#f1f5f9;letter-spacing:1px}
+.coin-tags{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap}
+.cat-badge{border:1px solid;border-radius:4px;padding:2px 6px;font-size:8px;font-weight:700}
+.cg-badge{border:1px solid rgba(59,130,246,.4);border-radius:4px;padding:2px 6px;
+  font-size:8px;font-weight:700;background:rgba(59,130,246,.1);color:#60a5fa}
+.price-wrap{text-align:right}
+.coin-price{font-size:12px;font-weight:700;color:var(--text)}
+.coin-chg{font-size:10px;font-weight:700}
+
+/* SCORE BAR */
+.score-row{display:flex;align-items:center;gap:7px;margin:9px 0 7px}
+.score-track{flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.04);overflow:hidden}
+.score-fill{height:100%;border-radius:3px;transition:width .5s}
+.score-num{font-family:var(--font-hud);font-size:12px;font-weight:900;min-width:26px}
+
+/* TARGETS */
+.target-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:8px}
+.t-cell{display:flex;flex-direction:column;gap:2px}
+.t-label{font-size:7px;color:#1e3a2f}
+.t-val{font-size:9px;font-weight:700}
+
+/* TA CHIPS */
+.ta-row{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:7px}
+.ta-chip{display:flex;gap:3px;align-items:center;background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.05);border-radius:5px;padding:2px 6px}
+.ta-l{font-size:7px;color:#1e3a2f;font-weight:700;letter-spacing:.5px}
+.ta-v{font-size:9px;font-weight:800}
+
+/* REASONS */
+.reasons{display:flex;flex-direction:column;gap:2px;margin-bottom:7px}
+.reason{font-size:9px;color:var(--muted);display:flex;align-items:center;gap:3px}
+.reason::before{content:"▶";color:var(--green);font-size:7px}
+
+/* BADGES */
+.badge-row{display:flex;gap:4px;flex-wrap:wrap}
+.vol-b{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;
+  background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:#60a5fa}
+.sqz-b{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;
+  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--yellow)}
+.acc-b{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;
+  background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--green)}
+.exp-b{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;
+  background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--yellow)}
+.fr-b{font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;
+  background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+
+/* OPP CARD */
+.opp-card{background:rgba(7,16,29,.98);border:1px solid var(--bg3);border-radius:10px;padding:14px;border-left:3px solid var(--green)}
+.opp-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.opp-score{font-family:var(--font-hud);font-size:18px;font-weight:900}
+.opp-label{font-size:8px;color:var(--muted)}
+.opp-targets{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+
+/* EMPTY */
+#empty{text-align:center;padding:70px 20px;position:relative;z-index:1}
+.empty-whale{font-size:58px;margin-bottom:14px}
+.empty-title{font-family:var(--font-hud);font-size:13px;font-weight:900;color:var(--green);letter-spacing:4px;margin-bottom:10px}
+.empty-desc{font-size:10px;color:var(--muted);line-height:2.2;max-width:330px;margin:0 auto}
+
+/* SECURITY SHIELD */
+#sec-bar{display:flex;gap:6px;padding:6px 14px;background:rgba(16,185,129,.03);
+  border-bottom:1px solid rgba(16,185,129,.06);overflow-x:auto;position:relative;z-index:1;flex-wrap:wrap}
+.sec-chip{font-size:8px;color:#1e3a2f;padding:2px 8px;border-radius:4px;
+  background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.1);white-space:nowrap}
+
+/* FOOTER */
+footer{font-size:8px;color:#1a2a1e;text-align:center;padding:20px 14px;
+  border-top:1px solid rgba(255,255,255,.03);margin-top:24px;line-height:2.5}
+
+/* ANIMATIONS */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes flashAnim{0%,100%{box-shadow:none}50%{box-shadow:0 0 35px rgba(16,185,129,.7)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div id="header">
+  <div class="logo-wrap">
+    <span class="logo-whale">🐳</span>
+    <div>
+      <div class="logo-title">WHALE PUMP SCANNER</div>
+      <div class="logo-sub">PRO v4.0 · TÜM USDT ÇİFTLERİ · 400+ COİN</div>
+    </div>
+  </div>
+  <div id="fg-box" class="fg-box" style="display:none">
+    <div class="fg-label">FEAR & GREED</div>
+    <div class="fg-val" id="fg-val">–</div>
+    <div class="fg-txt" id="fg-txt"></div>
+  </div>
+  <div class="header-right">
+    <button class="ibtn" id="sound-btn" onclick="toggleSound()" title="Ses">🔊</button>
+    <div style="position:relative">
+      <button class="ibtn" id="notif-btn" onclick="enableNotif()" title="Bildirim">🔔</button>
+      <span class="notif-dot" id="notif-dot"></span>
+    </div>
+    <button class="ibtn" id="auto-btn" onclick="toggleAuto()" title="Oto tarama">♻️</button>
+  </div>
+</div>
+
+<!-- SECURITY BAR -->
+<div id="sec-bar">
+  <span class="sec-chip">🔒 HTTPS Zorunlu</span>
+  <span class="sec-chip">🛡️ CSP Aktif</span>
+  <span class="sec-chip">🚫 XSS Koruması</span>
+  <span class="sec-chip">🔐 Clickjacking Engeli</span>
+  <span class="sec-chip">📵 Kamera/Mikrofon Kapalı</span>
+  <span class="sec-chip">🌐 Referrer Koruması</span>
+  <span class="sec-chip">⚡ Rate Limit: 400 coin/tarama</span>
+</div>
+
+<!-- SESSION BAR -->
+<div id="session-bar">
+  <div class="s-chip" id="sess-0"><span class="s-time">09:00–12:00</span><span class="s-label" style="color:#f59e0b">🌏 Asya Kapanış</span></div>
+  <div class="s-chip" id="sess-1"><span class="s-time">23:00–01:00</span><span class="s-label" style="color:#10b981">🌙 Asya Açılış</span></div>
+  <div class="s-chip" id="sess-2"><span class="s-time">03:00–06:00</span><span class="s-label" style="color:#ef4444">⚠️ Düşük Hacim</span></div>
+  <div class="cap-bar">
+    <span class="cap-item">Mid: %20-80 pot.</span>
+    <span class="cap-item">Large: %10-40</span>
+    <span class="cap-item">Balina çıkışı: %-5-15</span>
+    <span class="cap-item">Dump: pump×2-3</span>
+  </div>
+</div>
+
+<!-- SCAN ROW -->
+<div id="scan-row">
+  <button id="scan-btn" onclick="runScan()">🔍 TÜM PİYASAYI TARA (400+ COİN)</button>
+  <span class="last-txt" id="last-txt"></span>
+  <span class="auto-badge" id="auto-badge" style="display:none">⚡ 5dk oto</span>
+</div>
+
+<!-- PROGRESS -->
+<div id="prog-track"><div id="prog-fill"></div></div>
+
+<!-- PUMP BANNER -->
+<div id="pump-banner">
+  <div class="pb-left">
+    <div class="pb-label">EN YÜKSEK PUMP SİNYALİ</div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="pb-name" id="pb-name"></span>
+      <span id="pb-cat" class="cat-badge"></span>
+      <span style="font-size:9px;color:var(--muted)">→ kategoride yükselmemiş fırsatlar aşağıda</span>
+    </div>
+  </div>
+  <div class="pb-right" id="pb-score"></div>
+</div>
+
+<!-- TABS -->
+<div id="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('alt')">🔥 NOKTA ATIŞI <span class="tab-count" id="tc-alt">0</span></button>
+  <button class="tab-btn" onclick="switchTab('major')">👑 MAJOR <span class="tab-count" id="tc-major">0</span></button>
+  <button class="tab-btn" onclick="switchTab('cat')">🎯 KATEGORİ FIRSAT <span class="tab-count" id="tc-cat">0</span></button>
+</div>
+
+<!-- SECTIONS -->
+<div class="section active" id="sec-alt">
+  <div class="s-hdr"><span class="s-hdr-icon">🔥</span><div><div class="s-hdr-title">NOKTA ATIŞI</div><div class="s-hdr-sub">EN KARLI 10 ALTCOIN — SIRAYLA AL-SAT</div></div></div>
+  <div class="card-grid" id="alt-grid"></div>
+</div>
+<div class="section" id="sec-major">
+  <div class="s-hdr"><span class="s-hdr-icon">👑</span><div><div class="s-hdr-title" style="color:#f59e0b">MAJOR COİNLER</div><div class="s-hdr-sub">BÜYÜK KAPİTAL — TOP 10 FIRSAT</div></div></div>
+  <div class="card-grid" id="major-grid"></div>
+</div>
+<div class="section" id="sec-cat">
+  <div class="s-hdr" id="cat-hdr"><span class="s-hdr-icon">🎯</span><div><div class="s-hdr-title" id="cat-title" style="color:#10b981">KATEGORİ FIRSATLARI</div><div class="s-hdr-sub" id="cat-sub"></div></div></div>
+  <div class="opp-grid" id="cat-grid"></div>
+</div>
+
+<!-- EMPTY -->
+<div id="empty">
+  <div class="empty-whale">🐳</div>
+  <div class="empty-title">TARAMA BEKLENİYOR</div>
+  <div class="empty-desc">
+    "TÜM PİYASAYI TARA" butonuna basın.<br/>
+    Binance'deki 400+ USDT çifti analiz edilir.<br/><br/>
+    <span style="color:#1e3a2f">
+    RSI · MACD · Bollinger Bands · OBV<br/>
+    VWAP · CVD · Squeeze · ADX · Stochastic<br/>
+    Funding Rate · Open Interest<br/>
+    Fear & Greed · Pump Pattern · ATH Uzaklığı<br/>
+    Exchange Flow · CoinGecko Doğrulama
+    </span>
+  </div>
+</div>
+
+<footer>
+  ⚠️ YALNIZCA EĞİTİM AMAÇLIDIR — FİNANSAL TAVSİYE DEĞİLDİR
+  &nbsp;|&nbsp; Binance API · CoinGecko · Alternative.me
+  &nbsp;|&nbsp; Güvenlik: CSP · XSS · Clickjacking · HTTPS
+</footer>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════
+   GÜVENLİK: Rate limit & sanitize
+═══════════════════════════════════════════════════════════ */
+const RateLimiter = {
+  calls: {},
+  check(key, limit=10, windowMs=60000) {
+    const now = Date.now();
+    if (!this.calls[key]) this.calls[key] = [];
+    this.calls[key] = this.calls[key].filter(t => now - t < windowMs);
+    if (this.calls[key].length >= limit) return false;
+    this.calls[key].push(now);
+    return true;
+  }
+};
+function sanitize(str) {
+  if (typeof str !== 'string') return String(str||'');
+  return str.replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#x27;'}[c]));
+}
+function safeNum(n, fallback=0) {
+  const v = parseFloat(n);
+  return isNaN(v) ? fallback : v;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   KATEGORİ & MAJOR
+═══════════════════════════════════════════════════════════ */
+const CATEGORY_MAP = {
+  BTCUSDT:"Layer1",ETHUSDT:"Layer1",SOLUSDT:"Layer1",AVAXUSDT:"Layer1",
+  ADAUSDT:"Layer1",DOTUSDT:"Layer1",ATOMUSDT:"Layer1",NEARUSDT:"Layer1",
+  APTUSDT:"Layer1",ALGOUSDT:"Layer1",ICPUSDT:"Layer1",VETUSDT:"Layer1",
+  HBARUSDT:"Layer1",THETAUSDT:"Layer1",FTMUSDT:"Layer1",FLOWUSDT:"Layer1",
+  ZILUSDT:"Layer1",ONTUSDT:"Layer1",SEIUSDT:"Layer1",TIAUSDT:"Layer1",
+  STXUSDT:"Layer1",ROSEUSDT:"Layer1",CFXUSDT:"Layer1",IOTAUSDT:"Layer1",
+  EGLDUSDT:"Layer1",SUIUSDT:"Layer1",KASUSDT:"Layer1",ARUSDT:"Layer1",
+  QNTUSDT:"RWA",POLYXUSDT:"RWA",
+  UNIUSDT:"DeFi",AAVEUSDT:"DeFi",MKRUSDT:"DeFi",COMPUSDT:"DeFi",
+  CRVUSDT:"DeFi",SNXUSDT:"DeFi",YFIUSDT:"DeFi",BALUSDT:"DeFi",
+  ZRXUSDT:"DeFi",SUSHIUSDT:"DeFi",CAKEUSDT:"DeFi",LRCUSDT:"DeFi",
+  PENDLEUSDT:"DeFi",RUNEUSDT:"DeFi",WOOUSDT:"DeFi",LDOUSDT:"DeFi",
+  RPLUSDT:"DeFi",SSVUSDT:"DeFi",INJUSDT:"DeFi",ARBUSDT:"DeFi",
+  OPUSDT:"DeFi",JUPUSDT:"DeFi",EIGENUSDT:"DeFi",ENAUSDT:"DeFi",
+  DYDXUSDT:"DeFi",GMXUSDT:"DeFi",
+  FETUSDT:"AI",RENDERUSDT:"AI",TAOUSDT:"AI",GRTUSDT:"AI",
+  OCEANUSDT:"AI",BANDUSDT:"AI",REQUSDT:"AI",NMRUSDT:"AI",
+  PHAUSDT:"AI",CTSIUSDT:"AI",DUSKUSDT:"AI",STORJUSDT:"AI",AGIXUSDT:"AI",
+  DOGEUSDT:"Meme",BONKUSDT:"Meme",WIFUSDT:"Meme",SPELLUSDT:"Meme",
+  GMTUSDT:"Meme",PEPEUSDT:"Meme",FLOKIUSDT:"Meme",SHIBUSDT:"Meme",
+  NEIROUSDT:"Meme",PNUTUSDT:"Meme",
+  AXSUSDT:"GameFi",SANDUSDT:"GameFi",MANAUSDT:"GameFi",ENJUSDT:"GameFi",
+  GALAUSDT:"GameFi",ALICEUSDT:"GameFi",IMXUSDT:"GameFi",MAGICUSDT:"GameFi",
+  HIGHUSDT:"GameFi",BLURUSDT:"GameFi",APEUSDT:"GameFi",MBOXUSDT:"GameFi",
+  CHZUSDT:"GameFi",RONUSDT:"GameFi",YGGUSDT:"GameFi",
+  LINKUSDT:"Infra",LTCUSDT:"Infra",XLMUSDT:"Infra",ETCUSDT:"Infra",
+  FILUSDT:"Infra",MATICUSDT:"Infra",BNBUSDT:"Infra",XRPUSDT:"Infra",
+  HNTUSDT:"Infra",RVNUSDT:"Infra",CELRUSDT:"Infra",SKLUSDT:"Infra",
+  COTIUSDT:"Infra",POWRUSDT:"Infra",ANKRUSDT:"Infra",TRXUSDT:"Infra",
+  ZECUSDT:"Infra",DASHUSDT:"Infra",CKBUSDT:"Infra",
+};
+const CAT_META = {
+  Layer1:{ label:"Layer1",     icon:"⛓️",  color:"#6366f1" },
+  RWA:   { label:"RWA",        icon:"🏛️",  color:"#8b5cf6" },
+  DeFi:  { label:"DeFi",       icon:"🔮",  color:"#10b981" },
+  AI:    { label:"AI / Data",  icon:"🤖",  color:"#3b82f6" },
+  Meme:  { label:"Meme",       icon:"🐸",  color:"#f59e0b" },
+  GameFi:{ label:"GameFi/NFT", icon:"🎮",  color:"#ec4899" },
+  Infra: { label:"Infra",      icon:"🔧",  color:"#64748b" },
+  Other: { label:"Diğer",      icon:"💎",  color:"#94a3b8" },
+};
+const MAJOR_SET = new Set([
+  "BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT","XRPUSDT","ADAUSDT","DOGEUSDT",
+  "AVAXUSDT","TRXUSDT","LINKUSDT","DOTUSDT","MATICUSDT","LTCUSDT","ATOMUSDT",
+  "UNIUSDT","XLMUSDT","ETCUSDT","FILUSDT","APTUSDT","NEARUSDT",
+  "SUIUSDT","KASUSDT","ARUSDT","EGLDUSDT",
+]);
+const EXCLUDE_RE = /UP$|DOWN$|BULL$|BEAR$|3L$|3S$|5L$|5S$|2L$|2S$|HEDGE$|HALF$|TUSD|BUSD|USDC(?!T)|FDUSD$|^USDTUSDT/;
+
+/* ═══════════════════════════════════════════════════════════
+   TEKNİK ANALİZ
+═══════════════════════════════════════════════════════════ */
+function calcRSI(c,p=14){
+  if(c.length<p+1)return null;
+  let g=0,l=0;
+  for(let i=c.length-p;i<c.length;i++){const d=c[i]-c[i-1];if(d>0)g+=d;else l-=d;}
+  const ag=g/p,al=l/p;
+  return al===0?100:parseFloat((100-100/(1+ag/al)).toFixed(2));
+}
+function calcEMA(c,p){
+  if(c.length<p)return null;
+  const k=2/(p+1);
+  let e=c.slice(0,p).reduce((a,b)=>a+b,0)/p;
+  for(let i=p;i<c.length;i++)e=c[i]*k+e*(1-k);
+  return e;
+}
+function calcMACD(c){
+  const e12=calcEMA(c,12),e26=calcEMA(c,26);
+  return(!e12||!e26)?null:e12-e26;
+}
+function calcBB(c,p=20){
+  if(c.length<p)return null;
+  const sl=c.slice(-p),mean=sl.reduce((a,b)=>a+b,0)/p;
+  const std=Math.sqrt(sl.reduce((a,b)=>a+Math.pow(b-mean,2),0)/p);
+  return{upper:mean+2*std,middle:mean,lower:mean-2*std,bandwidth:(std*2)/(mean||1)};
+}
+function calcVolSurge(v){
+  if(v.length<10)return 1;
+  const avg=v.slice(-10,-1).reduce((a,b)=>a+b,0)/9;
+  return parseFloat((v[v.length-1]/(avg||1)).toFixed(2));
+}
+function calcStoch(h,l,c,p=14){
+  if(c.length<p)return null;
+  const hh=Math.max(...h.slice(-p)),ll=Math.min(...l.slice(-p));
+  return hh===ll?50:parseFloat(((c[c.length-1]-ll)/(hh-ll)*100).toFixed(2));
+}
+function calcADX(h,l,c,p=14){
+  if(c.length<p+1)return null;
+  let pdm=0,ndm=0,tr=0;
+  for(let i=c.length-p;i<c.length;i++){
+    const up=h[i]-h[i-1],dn=l[i-1]-l[i];
+    pdm+=(up>dn&&up>0)?up:0;ndm+=(dn>up&&dn>0)?dn:0;
+    tr+=Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1]));
+  }
+  if(tr===0)return null;
+  const pdi=(pdm/tr)*100,ndi=(ndm/tr)*100;
+  return parseFloat((Math.abs(pdi-ndi)/(pdi+ndi||1)*100).toFixed(2));
+}
+function calcOBV(c,v){
+  if(c.length<10)return{trend:"neutral",delta:0};
+  let obv=0;const arr=[];
+  for(let i=1;i<c.length;i++){obv+=c[i]>c[i-1]?v[i]:c[i]<c[i-1]?-v[i]:0;arr.push(obv);}
+  const r=arr.slice(-5).reduce((a,b)=>a+b,0)/5;
+  const pv=arr.slice(-10,-5).reduce((a,b)=>a+b,0)/5;
+  const delta=((r-pv)/(Math.abs(pv)||1)*100);
+  return{trend:delta>5?"accumulation":delta<-5?"distribution":"neutral",delta:parseFloat(delta.toFixed(1))};
+}
+function calcVWAP(h,l,c,v){
+  const n=Math.min(c.length,24);let tpv=0,vol=0;
+  for(let i=c.length-n;i<c.length;i++){const tp=(h[i]+l[i]+c[i])/3;tpv+=tp*v[i];vol+=v[i];}
+  return vol>0?tpv/vol:null;
+}
+function calcCVD(c,v){
+  const n=Math.min(c.length,20);let cvd=0,tot=0;
+  for(let i=c.length-n+1;i<c.length;i++){cvd+=v[i]*(c[i]>=c[i-1]?1:-1);tot+=v[i];}
+  return parseFloat((cvd/(tot||1)*100).toFixed(1));
+}
+function calcSqueeze(c,h,l,p=20){
+  const bb=calcBB(c,p);if(!bb)return{squeezed:false,momentum:0};
+  const slH=h.slice(-p),slL=l.slice(-p),slC=c.slice(-p);
+  const trA=slH.map((hv,i)=>Math.max(hv-slL[i],i>0?Math.abs(hv-slC[i-1]):0,i>0?Math.abs(slL[i]-slC[i-1]):0));
+  const atr=trA.reduce((a,b)=>a+b,0)/p;
+  return{squeezed:bb.upper<bb.middle+1.5*atr&&bb.lower>bb.middle-1.5*atr,momentum:c[c.length-1]-bb.middle};
+}
+function calcPumpPattern(c,v){
+  if(c.length<20)return 0;
+  const rC=c.slice(-5),pC=c.slice(-20,-5),rV=v.slice(-5),pV=v.slice(-20,-5);
+  const avgP=pC.reduce((a,b)=>a+b,0)/pC.length;
+  const flat=(Math.max(...pC)-Math.min(...pC))/avgP;
+  const avgPV=pV.reduce((a,b)=>a+b,0)/pV.length;
+  const volExp=(rV.reduce((a,b)=>a+b,0)/rV.length)/(avgPV||1);
+  const pBrk=(rC[rC.length-1]-pC[pC.length-1])/avgP*100;
+  let s=0;
+  if(flat<0.03)s+=30;if(volExp>2)s+=40;if(pBrk>2)s+=30;
+  return Math.min(s,100);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SKORLAMA
+═══════════════════════════════════════════════════════════ */
+function scoreSignal({rsi,macd,bb,volSurge,pct24h,stoch,adx,obv,vwap,price,cvd,squeeze,pumpPat,fr,oiChg,athDist,exFlow}){
+  let score=0;const reasons=[];
+  if(rsi!==null){
+    if(rsi<25){score+=30;reasons.push(`RSI ${rsi} — AŞIRI SATIŞ 🔥🔥`);}
+    else if(rsi<35){score+=24;reasons.push(`RSI ${rsi} — aşırı satım 🔥`);}
+    else if(rsi<45){score+=15;reasons.push(`RSI ${rsi} — güçlü sinyal`);}
+    else if(rsi<55){score+=7;reasons.push(`RSI ${rsi} — nötr-olumlu`);}
+    else if(rsi>75){score-=18;reasons.push(`RSI ${rsi} — aşırı alım ↓`);}
+    else if(rsi>65){score-=8;reasons.push(`RSI ${rsi} — dikkat`);}
+  }
+  if(macd!==null){if(macd>0){score+=15;reasons.push("MACD pozitif ✓");}else{score+=2;reasons.push("MACD negatif");}}
+  if(bb&&price){
+    const range=bb.upper-bb.lower;
+    if(range>0){
+      const pos=(price-bb.lower)/range;
+      if(pos<0.15){score+=20;reasons.push("BB alt sınır — bounce 🎯");}
+      else if(pos<0.30){score+=13;reasons.push("BB alt bant → bounce 🎯");}
+      else if(pos<0.50){score+=6;reasons.push("BB orta-alt bölge");}
+    }
+    if(bb.bandwidth<0.04){score+=10;reasons.push("BB Squeeze — patlama yakın 💥");}
+  }
+  if(volSurge>=8){score+=25;reasons.push(`Hacim ${volSurge}x — MEGA balina 🐳🐳`);}
+  else if(volSurge>=5){score+=22;reasons.push(`Hacim ${volSurge}x — balina 🐳`);}
+  else if(volSurge>=3){score+=16;reasons.push(`Hacim ${volSurge}x anormallik 🔥`);}
+  else if(volSurge>=2){score+=10;reasons.push(`Hacim ${volSurge}x artış`);}
+  else if(volSurge>=1.5){score+=5;reasons.push(`Hacim ${volSurge}x`);}
+  if(stoch!==null){
+    if(stoch<15){score+=12;reasons.push(`Stoch ${stoch} — ekstrem satım`);}
+    else if(stoch<25){score+=9;reasons.push(`Stoch ${stoch} — aşırı satım`);}
+    else if(stoch<40){score+=5;reasons.push(`Stoch ${stoch} — düşük`);}
+    else if(stoch>85){score-=10;reasons.push(`Stoch ${stoch} — aşırı alım`);}
+  }
+  if(adx!==null){if(adx>35){score+=8;reasons.push(`ADX ${adx} — güçlü trend`);}else if(adx>20){score+=4;reasons.push(`ADX ${adx} — trend başlıyor`);}}
+  if(obv){
+    if(obv.trend==="accumulation"){score+=12;reasons.push(`OBV birikim +${obv.delta}% 🐋`);}
+    else if(obv.trend==="distribution"){score-=8;reasons.push(`OBV dağıtım ${obv.delta}% ↓`);}
+  }
+  if(vwap&&price){const d=((price-vwap)/vwap)*100;if(d>-3&&d<0){score+=8;reasons.push("Fiyat VWAP altı — dip bölge");}else if(d>=0&&d<2){score+=4;reasons.push("Fiyat VWAP üstü");}}
+  if(cvd>20){score+=10;reasons.push(`CVD +${cvd}% — alıcı baskısı 💪`);}else if(cvd>8){score+=6;reasons.push(`CVD +${cvd}% — net alım`);}else if(cvd<-15){score-=8;reasons.push(`CVD ${cvd}% — satıcı baskısı`);}
+  if(squeeze){if(squeeze.squeezed){score+=10;reasons.push("Squeeze aktif — patlama geliyor 💥");}if(squeeze.momentum>0){score+=4;reasons.push("Momentum pozitif ↑");}}
+  if(pumpPat>=70){score+=12;reasons.push(`Pump pattern %${pumpPat} eşleşme 🎯`);}else if(pumpPat>=40){score+=6;reasons.push(`Pump pattern %${pumpPat}`);}
+  if(fr!==null){if(fr<-0.01){score+=8;reasons.push(`FR ${(fr*100).toFixed(3)}% — short squeeze riski`);}else if(fr>0.05){score-=6;reasons.push(`FR ${(fr*100).toFixed(3)}% yüksek`);}}
+  if(oiChg>15){score+=8;reasons.push(`OI +%${oiChg.toFixed(1)} artıyor`);}else if(oiChg<-15){score-=5;reasons.push(`OI -%${Math.abs(oiChg).toFixed(1)}`);}
+  if(athDist!==null){if(athDist<-70){score+=10;reasons.push(`ATH'den -%${Math.abs(athDist)} derin dip`);}else if(athDist<-50){score+=6;reasons.push(`ATH'den -%${Math.abs(athDist)}`);}else if(athDist>-10){score-=5;reasons.push("ATH yakını — risk yüksek");}}
+  if(exFlow<-10){score+=8;reasons.push("Borsadan çıkış — birikim 📤");}else if(exFlow>15){score-=6;reasons.push("Borsaya giriş — satış baskısı 📥");}
+  if(pct24h>1&&pct24h<10){score+=8;reasons.push(`24s +${pct24h.toFixed(1)}% ivme`);}
+  else if(pct24h>=10&&pct24h<18){score+=3;reasons.push(`24s +${pct24h.toFixed(1)}%`);}
+  else if(pct24h>=18){score-=20;reasons.push("Zaten pump edilmiş ⚠️");}
+  else if(pct24h<-10){score+=6;reasons.push(`24s ${pct24h.toFixed(1)}% dip?`);}
+  return{score:Math.min(Math.max(Math.round(score),0),100),reasons:reasons.slice(0,5)};
+}
+function getTargets(price,score){
+  const pct=score>=85?0.22:score>=70?0.15:score>=55?0.09:0.06;
+  return{stop:price*0.932,t1:price*(1+pct*0.5),t2:price*(1+pct)};
+}
+function fmtP(p){
+  if(!p||isNaN(p))return"–";
+  const v=Math.abs(p);
+  if(v<0.0000001)return p.toExponential(2);
+  if(v<0.00001)return p.toFixed(8);
+  if(v<0.001)return p.toFixed(6);
+  if(v<0.1)return p.toFixed(5);
+  if(v<1)return p.toFixed(4);
+  if(v<100)return p.toFixed(3);
+  if(v<10000)return p.toFixed(2);
+  return p.toLocaleString("en-US",{maximumFractionDigits:0});
+}
+const fmtUSD=p=>"$"+fmtP(p);
+
+/* ═══════════════════════════════════════════════════════════
+   SES & BİLDİRİM
+═══════════════════════════════════════════════════════════ */
+let soundOn=true, notifOn=false, autoMode=false, autoTimer=null, scanning=false;
+const notifiedSet=new Set();
+
+function playPumpAlert(){
+  if(!soundOn)return;
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [[440,0,"square"],[660,0.18,"square"],[880,0.36,"square"],[1100,0.54,"sine"]].forEach(([f,t,type])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type=type;o.frequency.value=f;
+      g.gain.setValueAtTime(0.25,ctx.currentTime+t);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+t+0.18);
+      o.start(ctx.currentTime+t);o.stop(ctx.currentTime+t+0.2);
+    });
+  }catch(e){}
+}
+async function enableNotif(){
+  if(!("Notification" in window)){alert("Tarayıcınız bildirimleri desteklemiyor.");return;}
+  const p=await Notification.requestPermission();
+  notifOn=p==="granted";
+  document.getElementById("notif-btn").className="ibtn"+(notifOn?" on":"");
+  document.getElementById("notif-dot").style.display=notifOn?"none":"";
+  if(notifOn)new Notification("🐳 Whale Pump Scanner PRO","Bildirimler aktif!");
+}
+function sendNotif(title,body){
+  if(notifOn&&Notification.permission==="granted")new Notification(`🐳 ${title}`,{body});
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById("sound-btn").className="ibtn"+(soundOn?" on":"");
+  document.getElementById("sound-btn").textContent=soundOn?"🔊":"🔇";
+}
+function toggleAuto(){
+  autoMode=!autoMode;
+  document.getElementById("auto-btn").className="ibtn"+(autoMode?" on":"");
+  document.getElementById("auto-badge").style.display=autoMode?"":"none";
+  if(autoMode){runScan();autoTimer=setInterval(runScan,5*60*1000);}
+  else{clearInterval(autoTimer);}
+}
+function switchTab(tab){
+  document.querySelectorAll(".tab-btn").forEach((b,i)=>{b.className="tab-btn"+(["alt","major","cat"][i]===tab?" active":"");});
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.getElementById("sec-"+tab).classList.add("active");
+}
+function scoreColor(s){return s>=80?"#10b981":s>=65?"#f59e0b":s>=45?"#3b82f6":"#475569";}
+
+/* ═══════════════════════════════════════════════════════════
+   SESSION HIGHLIGHT
+═══════════════════════════════════════════════════════════ */
+function updateSession(){
+  const h=new Date().getHours();
+  const active=h>=9&&h<12?0:h>=23||h<1?1:h>=3&&h<6?2:-1;
+  [0,1,2].forEach(i=>{
+    const el=document.getElementById("sess-"+i);
+    if(el)el.style.borderColor=active===i?["#f59e0b","#10b981","#ef4444"][i]:"rgba(255,255,255,.05)";
+  });
+}
+updateSession();setInterval(updateSession,60000);
+
+/* ═══════════════════════════════════════════════════════════
+   API CALLS — güvenli fetch wrapper
+═══════════════════════════════════════════════════════════ */
+const ALLOWED_ORIGINS=["api.binance.com","fapi.binance.com","api.alternative.me","api.coingecko.com"];
+async function safeFetch(url,timeout=8000){
+  try{
+    const origin=new URL(url).hostname;
+    if(!ALLOWED_ORIGINS.some(o=>origin.endsWith(o)))throw new Error("Blocked origin: "+origin);
+    const ctrl=new AbortController();
+    const tid=setTimeout(()=>ctrl.abort(),timeout);
+    const r=await fetch(url,{signal:ctrl.signal,headers:{"Accept":"application/json"}});
+    clearTimeout(tid);
+    if(!r.ok)return null;
+    return await r.json();
+  }catch{return null;}
+}
+async function fetchAllSymbols(){
+  const d=await safeFetch("https://api.binance.com/api/v3/exchangeInfo");
+  if(!d)return null;
+  return d.symbols
+    .filter(s=>s.quoteAsset==="USDT"&&s.status==="TRADING"&&!EXCLUDE_RE.test(s.symbol))
+    .map(s=>s.symbol);
+}
+async function fetchTicker24hAll(){
+  const d=await safeFetch("https://api.binance.com/api/v3/ticker/24hr");
+  if(!d)return null;
+  const map={};d.forEach(t=>{map[t.symbol]=t;});return map;
+}
+async function fetchKlines(symbol){
+  return await safeFetch(`https://api.binance.com/api/v3/klines?symbol=${encodeURIComponent(symbol)}&interval=1h&limit=60`);
+}
+async function fetchFR(symbol){
+  const d=await safeFetch(`https://fapi.binance.com/fapi/v1/fundingRate?symbol=${encodeURIComponent(symbol)}&limit=1`);
+  return d&&d.length>0?safeNum(d[0].fundingRate):null;
+}
+async function fetchOI(symbol){
+  const d=await safeFetch(`https://fapi.binance.com/fapi/v1/openInterest?symbol=${encodeURIComponent(symbol)}`);
+  return d?safeNum(d.openInterest):null;
+}
+async function fetchFearGreed(){
+  const d=await safeFetch("https://api.alternative.me/fng/?limit=1");
+  if(!d||!d.data)return null;
+  return{value:parseInt(d.data[0].value),label:d.data[0].value_classification};
+}
+const cgCache={};
+async function verifyCG(symbol){
+  const CG_ID={BTCUSDT:"bitcoin",ETHUSDT:"ethereum",SOLUSDT:"solana",DOGEUSDT:"dogecoin",BONKUSDT:"bonk",WIFUSDT:"dogwifcoin",FETUSDT:"fetch-ai",RENDERUSDT:"render-token",TAOUSDT:"bittensor",GRTUSDT:"the-graph",AAVEUSDT:"aave",INJUSDT:"injective-protocol"};
+  const id=CG_ID[symbol];if(!id)return null;
+  if(cgCache[id]!==undefined)return cgCache[id];
+  const d=await safeFetch(`https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&market_data=false`,5000);
+  if(!d){cgCache[id]=null;return null;}
+  const cats=(d.categories||[]).join(" ").toLowerCase();
+  let cat=null;
+  if(/artificial intelligence|machine learning/.test(cats))cat="AI";
+  else if(/meme|dog coin|pepe/.test(cats))cat="Meme";
+  else if(/defi|decentralized finance/.test(cats))cat="DeFi";
+  else if(/gaming|nft|metaverse/.test(cats))cat="GameFi";
+  else if(/real.world|rwa/.test(cats))cat="RWA";
+  else if(/layer.1|smart contract/.test(cats))cat="Layer1";
+  else if(/infrastructure|oracle/.test(cats))cat="Infra";
+  cgCache[id]=cat;return cat;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COİN ANALİZ
+═══════════════════════════════════════════════════════════ */
+async function analyzeCoin(symbol,tickerMap){
+  const t=tickerMap[symbol];if(!t)return null;
+  const qVol=safeNum(t.quoteVolume);
+  if(qVol<30000)return null;
+  const raw=await fetchKlines(symbol);
+  if(!raw||raw.length<20)return null;
+  const closes=raw.map(k=>safeNum(k[4])),vols=raw.map(k=>safeNum(k[5]));
+  const highs=raw.map(k=>safeNum(k[2])),lows=raw.map(k=>safeNum(k[3]));
+  const price=closes[closes.length-1];
+  const pct24h=safeNum(t.priceChangePercent);
+  const rsi=calcRSI(closes,14),macd=calcMACD(closes),bb=calcBB(closes,20);
+  const volSurge=calcVolSurge(vols),stoch=calcStoch(highs,lows,closes,14);
+  const adx=calcADX(highs,lows,closes,14),obv=calcOBV(closes,vols);
+  const vwap=calcVWAP(highs,lows,closes,vols),cvd=calcCVD(closes,vols);
+  const squeeze=calcSqueeze(closes,highs,lows,20),pumpPat=calcPumpPattern(closes,vols);
+  let fr=null,oiChg=0;
+  if(qVol>500000){
+    const[f,oi]=await Promise.all([fetchFR(symbol),fetchOI(symbol)]);
+    fr=f;if(oi&&price)oiChg=((oi*price)/(qVol||1)-1)*100;
+  }
+  const high52w=safeNum(t.highPrice,price);
+  const athDist=high52w>0?parseFloat(((price-high52w)/high52w*100).toFixed(1)):null;
+  const exFlow=cvd>0?-cvd*0.3:Math.abs(cvd)*0.3;
+  const{score,reasons}=scoreSignal({rsi,macd,bb,volSurge,pct24h,stoch,adx,obv,vwap,price,cvd,squeeze,pumpPat,fr,oiChg,athDist,exFlow});
+  if(score<25)return null;
+  const{stop,t1,t2}=getTargets(price,score);
+  return{symbol,name:sanitize(symbol.replace("USDT","")),price,score,rsi,macd,volSurge,pct24h,stoch,adx,obv,vwap,cvd,squeeze,pumpPat,fr,oiChg,athDist,bb,stop,t1,t2,reasons,category:CATEGORY_MAP[symbol]||"Other",qVol,isMajor:MAJOR_SET.has(symbol),cgVerified:false};
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER CARD
+═══════════════════════════════════════════════════════════ */
+function renderCard(sig){
+  const c=scoreColor(sig.score);
+  const cm=CAT_META[sig.category]||CAT_META.Other;
+  const chgColor=sig.pct24h>=0?"#10b981":"#ef4444";
+  function tc(l,v,col){return`<div class="ta-chip"><span class="ta-l">${l}</span><span class="ta-v" style="color:${col}">${sanitize(String(v))}</span></div>`;}
+  let tachips="";
+  if(sig.rsi!==null)tachips+=tc("RSI",sig.rsi,sig.rsi<35?"#10b981":sig.rsi>70?"#ef4444":"#f59e0b");
+  tachips+=tc("VOL",`${sig.volSurge}x`,sig.volSurge>=3?"#10b981":sig.volSurge>=2?"#f59e0b":"#64748b");
+  if(sig.macd!==null)tachips+=tc("MACD",sig.macd>0?"▲":"▼",sig.macd>0?"#10b981":"#ef4444");
+  if(sig.stoch!==null)tachips+=tc("STOCH",sig.stoch,sig.stoch<30?"#10b981":sig.stoch>70?"#ef4444":"#64748b");
+  if(sig.adx!==null)tachips+=tc("ADX",sig.adx,sig.adx>25?"#6366f1":"#334155");
+  if(sig.obv)tachips+=tc("OBV",sig.obv.trend==="accumulation"?"🐋":sig.obv.trend==="distribution"?"↓":"=",sig.obv.trend==="accumulation"?"#10b981":sig.obv.trend==="distribution"?"#ef4444":"#475569");
+  if(sig.cvd!==0)tachips+=tc("CVD",`${sig.cvd>0?"+":""}${sig.cvd}%`,sig.cvd>0?"#10b981":"#ef4444");
+  if(sig.squeeze?.squeezed)tachips+=tc("SQZ","💥","#f59e0b");
+  if(sig.fr!==null)tachips+=tc("FR",`${(sig.fr*100).toFixed(3)}%`,sig.fr<0?"#10b981":sig.fr>0.03?"#ef4444":"#334155");
+  if(sig.pumpPat>=40)tachips+=tc("PAT",`${sig.pumpPat}%`,"#a855f7");
+  if(sig.athDist!==null)tachips+=tc("ATH",`${sig.athDist}%`,sig.athDist<-50?"#10b981":sig.athDist>-10?"#ef4444":"#475569");
+  let badges="";
+  if(sig.volSurge>=2)badges+=`<span class="vol-b">VOL ${sig.volSurge}x</span>`;
+  if(sig.rsi&&sig.rsi<40)badges+=`<span class="sqz-b">SQUEEZE</span>`;
+  if(sig.obv?.trend==="accumulation")badges+=`<span class="acc-b">BİRİKİM 🐳</span>`;
+  if(sig.squeeze?.squeezed)badges+=`<span class="exp-b">PATLAMA HAZIR 💥</span>`;
+  if(sig.fr!==null&&sig.fr<-0.005)badges+=`<span class="fr-b">SHORT SQZ</span>`;
+  return`<div class="ccard" id="card-${sig.symbol}" style="border-color:${sig.rank<=3?c:"#0d1b2a"}">
+    <div class="rank-b" style="background:${c}">${sig.rank}</div>
+    <div class="al-b">AL</div>
+    <div class="card-head">
+      <div>
+        <div class="coin-name">${sig.name}</div>
+        <div class="coin-tags">
+          <span class="cat-badge" style="background:${cm.color}18;border-color:${cm.color};color:${cm.color}">${cm.icon} ${cm.label}</span>
+          ${sig.cgVerified?'<span class="cg-badge">CG ✓</span>':""}
+        </div>
+      </div>
+      <div class="price-wrap">
+        <div class="coin-price">${fmtUSD(sig.price)}</div>
+        <div class="coin-chg" style="color:${chgColor}">${sig.pct24h>=0?"+":""}${sig.pct24h?.toFixed(2)}% 24s</div>
+      </div>
+    </div>
+    <div class="score-row">
+      <div class="score-track"><div class="score-fill" style="width:${sig.score}%;background:${c};box-shadow:0 0 6px ${c}"></div></div>
+      <span class="score-num" style="color:${c}">${sig.score}</span>
+    </div>
+    <div class="target-grid">
+      <div class="t-cell"><span class="t-label">🟢 GİRİŞ</span><span class="t-val" style="color:#94a3b8">${fmtUSD(sig.price)}</span></div>
+      <div class="t-cell"><span class="t-label">🔴 STOP</span><span class="t-val" style="color:#ef4444">${fmtUSD(sig.stop)}</span></div>
+      <div class="t-cell"><span class="t-label">🎯 H1</span><span class="t-val" style="color:#10b981">${fmtUSD(sig.t1)}</span></div>
+      <div class="t-cell"><span class="t-label">🏆 H2</span><span class="t-val" style="color:#f59e0b">${fmtUSD(sig.t2)}</span></div>
+    </div>
+    <div class="ta-row">${tachips}</div>
+    <div class="reasons">${sig.reasons.slice(0,4).map(r=>`<span class="reason">${sanitize(r)}</span>`).join("")}</div>
+    <div class="badge-row">${badges}</div>
+  </div>`;
+}
+
+function renderOppCard(sig,rank){
+  const c=scoreColor(sig.score);
+  const catColor=(CAT_META[sig.category]||CAT_META.Other).color;
+  function tc(l,v,col){return`<div class="ta-chip"><span class="ta-l">${l}</span><span class="ta-v" style="color:${col}">${sanitize(String(v))}</span></div>`;}
+  let tachips="";
+  if(sig.rsi!==null)tachips+=tc("RSI",sig.rsi,sig.rsi<40?"#10b981":"#f59e0b");
+  tachips+=tc("VOL",`${sig.volSurge}x`,sig.volSurge>=2?"#10b981":"#64748b");
+  if(sig.macd!==null)tachips+=tc("MACD",sig.macd>0?"▲":"▼",sig.macd>0?"#10b981":"#ef4444");
+  if(sig.obv?.trend==="accumulation")tachips+=tc("OBV","🐋","#10b981");
+  if(sig.cvd>0)tachips+=tc("CVD",`+${sig.cvd}%`,"#10b981");
+  return`<div class="opp-card" style="border-left-color:${catColor}">
+    <div class="opp-head">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <div class="rank-b" style="position:static;width:20px;height:20px;font-size:10px;background:${c};border-radius:5px;display:inline-flex;align-items:center;justify-content:center">${rank}</div>
+          <span style="font-family:var(--font-hud);font-size:12px;font-weight:900;color:#e2e8f0">${sig.name}</span>
+        </div>
+        <div style="font-size:10px;color:#475569">${fmtUSD(sig.price)} · ${sig.pct24h>=0?"+":""}${sig.pct24h?.toFixed(2)}% 24s</div>
+      </div>
+      <div><div class="opp-score" style="color:${c}">${sig.score}</div><div class="opp-label">PUAN</div></div>
+    </div>
+    <div class="ta-row">${tachips}</div>
+    <div class="opp-targets">
+      <div class="t-cell"><span class="t-label">🎯 HEDEF 1</span><span class="t-val" style="color:#10b981">${fmtUSD(sig.t1)}</span></div>
+      <div class="t-cell"><span class="t-label">🏆 HEDEF 2</span><span class="t-val" style="color:#f59e0b">${fmtUSD(sig.t2)}</span></div>
+      <div class="t-cell"><span class="t-label">🔴 STOP</span><span class="t-val" style="color:#ef4444">${fmtUSD(sig.stop)}</span></div>
+    </div>
+    ${sig.reasons[0]?`<div style="margin-top:6px;font-size:9px;color:var(--muted)">▶ ${sanitize(sig.reasons[0])}</div>`:""}
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANA TARAMA
+═══════════════════════════════════════════════════════════ */
+async function runScan(){
+  if(scanning)return;
+  if(!RateLimiter.check("scan",3,60000)){alert("Çok sık tarama! Lütfen bekleyin.");return;}
+  scanning=true;
+  const btn=document.getElementById("scan-btn");
+  btn.disabled=true;
+  btn.innerHTML='<span class="spinner"></span> Taranıyor…';
+  document.getElementById("prog-track").style.display="block";
+  document.getElementById("empty").style.display="none";
+  document.getElementById("alt-grid").innerHTML="";
+  document.getElementById("major-grid").innerHTML="";
+  document.getElementById("cat-grid").innerHTML="";
+  document.getElementById("pump-banner").style.display="none";
+  document.getElementById("tab-bar").style.display="none";
+  fetchFearGreed().then(fg=>{
+    if(!fg)return;
+    const box=document.getElementById("fg-box");
+    const fgColor=fg.value<=25?"#ef4444":fg.value<=45?"#f59e0b":fg.value<=65?"#eab308":"#10b981";
+    box.style.display="block";box.style.borderColor=fgColor;box.style.color=fgColor;
+    document.getElementById("fg-val").textContent=fg.value;
+    document.getElementById("fg-txt").textContent=fg.label;
+  });
+  const[allSymbols,tickerMap]=await Promise.all([fetchAllSymbols(),fetchTicker24hAll()]);
+  if(!allSymbols||!tickerMap){scanning=false;btn.disabled=false;btn.innerHTML="🔍 TÜM PİYASAYI TARA (400+ COİN)";return;}
+  const sorted=allSymbols.filter(s=>tickerMap[s]).sort((a,b)=>safeNum(tickerMap[b]?.quoteVolume)-safeNum(tickerMap[a]?.quoteVolume)).slice(0,400);
+  const total=sorted.length;
+  const results=[];
+  const BATCH=6;
+  for(let i=0;i<sorted.length;i+=BATCH){
+    const batch=sorted.slice(i,i+BATCH);
+    const br=await Promise.all(batch.map(s=>analyzeCoin(s,tickerMap)));
+    br.forEach(r=>{if(r)results.push(r);});
+    const done=Math.min(i+BATCH,sorted.length);
+    const pct=Math.round(done/total*100);
+    document.getElementById("prog-fill").style.width=pct+"%";
+    btn.innerHTML=`<span class="spinner"></span> ${done}/${total} — %${pct}`;
+    await new Promise(r=>setTimeout(r,50));
+  }
+  results.sort((a,b)=>b.score-a.score);
+  const altTop=results.filter(c=>!c.isMajor).slice(0,10).map((c,i)=>({...c,rank:i+1}));
+  const majTop=results.filter(c=>c.isMajor).slice(0,10).map((c,i)=>({...c,rank:i+1}));
+  document.getElementById("alt-grid").innerHTML=altTop.map(renderCard).join("");
+  document.getElementById("major-grid").innerHTML=majTop.map(renderCard).join("");
+  document.getElementById("tc-alt").textContent=altTop.length;
+  document.getElementById("tc-major").textContent=majTop.length;
+  const topP=results[0]||null;
+  if(topP){
+    const cm=CAT_META[topP.category]||CAT_META.Other;
+    document.getElementById("pb-name").textContent=topP.name;
+    const pbc=document.getElementById("pb-cat");
+    pbc.textContent=`${cm.icon} ${cm.label}`;
+    pbc.style.background=cm.color+"1a";pbc.style.borderColor=cm.color;pbc.style.color=cm.color;
+    document.getElementById("pb-score").textContent=topP.score;
+    document.getElementById("pb-score").style.color=scoreColor(topP.score);
+    document.getElementById("pump-banner").style.display="flex";
+    const catTitle=document.getElementById("cat-title");
+    catTitle.textContent=`${cm.icon} ${cm.label} — YÜKSELMEMİŞ 5 FIRSAT`;
+    catTitle.style.color=cm.color;
+    document.getElementById("cat-sub").textContent=`${topP.name} pump yaptı → aynı kategoride kriterlere uyan coinler`;
+    const opps=results.filter(c=>c.category===topP.category&&c.symbol!==topP.symbol&&c.pct24h<10&&c.score>=40&&c.volSurge<4).sort((a,b)=>b.score-a.score).slice(0,5);
+    document.getElementById("cat-grid").innerHTML=opps.length>0?opps.map((s,i)=>renderOppCard(s,i+1)):'<div style="color:var(--muted);font-size:12px;padding:30px">Bu kategoride uygun sinyal bulunamadı.</div>';
+    document.getElementById("tc-cat").textContent=opps.length;
+  }
+  document.getElementById("tab-bar").style.display="flex";
+  results.slice(0,3).forEach(sig=>{
+    const key=`${sig.symbol}-${Math.floor(Date.now()/300000)}`;
+    if(!notifiedSet.has(key)){
+      notifiedSet.add(key);
+      playPumpAlert();
+      sendNotif(`🚀 ${sig.name} — ${sig.score}puan`,`${fmtUSD(sig.price)} | Vol ${sig.volSurge}x | ${sig.reasons[0]||""}`);
+      const card=document.getElementById("card-"+sig.symbol);
+      if(card){card.classList.add("flash");setTimeout(()=>card.classList.remove("flash"),2000);}
+    }
+  });
+  // CoinGecko arka plan
+  [...altTop,...majTop].slice(0,10).forEach(async sig=>{
+    const cgCat=await verifyCG(sig.symbol);
+    if(cgCat&&cgCat!==sig.category){
+      const card=document.getElementById("card-"+sig.symbol);
+      if(card){const t=card.querySelector(".coin-tags");if(t&&!t.querySelector(".cg-badge"))t.innerHTML+=`<span class="cg-badge">CG ✓</span>`;}
+    }
+  });
+  document.getElementById("last-txt").textContent="Son: "+new Date().toLocaleTimeString("tr-TR");
+  document.getElementById("prog-track").style.display="none";
+  btn.disabled=false;btn.innerHTML="🔍 TÜM PİYASAYI TARA (400+ COİN)";
+  scanning=false;
+}
+</script>
+</body>
+</html>
